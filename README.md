@@ -4,7 +4,9 @@
 stack test --file-watch --fast
 ```
 
-Step 1: add lexer
+Steps:
+1. add lexer
+2. add parser
 
 --------
 
