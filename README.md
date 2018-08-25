@@ -4,6 +4,10 @@
 stack test --file-watch --fast
 ```
 
+Step 1: add lexer
+
+--------
+
 * lexer, tokenizer: convert characters to tokens
 * parser: convert tokens to ast
 * type checking / type inference
