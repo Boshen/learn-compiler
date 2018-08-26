@@ -5,19 +5,10 @@ import           Text.Parsec.String   (Parser)
 import qualified Text.Parsec.Token    as T
 
 lexer :: T.TokenParser ()
-lexer =
-  T.makeTokenParser $
-  emptyDef
-    { T.commentLine = "#"
-    , T.reservedOpNames = ["+", "*", "-", ";"]
-    , T.reservedNames = ["def", "extern"]
-    }
+lexer = T.makeTokenParser emptyDef
 
 integer :: Parser Integer
 integer = T.integer lexer
-
-float :: Parser Double
-float = T.float lexer
 
 parens :: Parser a -> Parser a
 parens = T.parens lexer

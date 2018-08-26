@@ -13,9 +13,6 @@ spec = describe "Lexer" $ do
   prop "integer" $ \i ->
     parse L.integer "" (show (i :: Integer)) == Right i
 
-  prop "float" $ \i -> i >= 0 ==>
-    parse L.float "" (show (i :: Double)) == Right i
-
   prop "parens" $ \i ->
     parse (L.parens L.integer) "" ("(" ++ show (i :: Integer) ++ ")") == Right i
 
