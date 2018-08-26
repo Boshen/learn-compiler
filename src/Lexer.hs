@@ -4,8 +4,14 @@ import           Text.Parsec.Language (emptyDef)
 import           Text.Parsec.String   (Parser)
 import qualified Text.Parsec.Token    as T
 
+opNames :: [String]
+opNames = ["="]
+
 lexer :: T.TokenParser ()
-lexer = T.makeTokenParser emptyDef
+lexer = T.makeTokenParser emptyDef {T.reservedOpNames = opNames}
+
+whiteSpace :: Parser ()
+whiteSpace = T.whiteSpace lexer
 
 integer :: Parser Integer
 integer = T.integer lexer
@@ -21,6 +27,9 @@ semiSep = T.semiSep lexer
 
 identifier :: Parser String
 identifier = T.identifier lexer
+
+str :: Parser String
+str = T.stringLiteral lexer
 
 reserved :: String -> Parser ()
 reserved = T.reserved lexer

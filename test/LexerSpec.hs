@@ -13,6 +13,9 @@ spec = describe "Lexer" $ do
   prop "integer" $ \i ->
     parse L.integer "" (show (i :: Integer)) == Right i
 
+  prop "str" $ \s ->
+    parse L.str "" (show (s :: String)) == Right s
+
   prop "parens" $ \i ->
     parse (L.parens L.integer) "" ("(" ++ show (i :: Integer) ++ ")") == Right i
 
