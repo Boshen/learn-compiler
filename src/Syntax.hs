@@ -7,8 +7,13 @@ data Expr
   | Var Name
   | Str String
   | Boolean Bool
-  | Lambda Name Expr
-  | App Expr Expr
+  | Lambda Name
+           Expr
+  | Let Name
+        Expr
+        Expr
+  | App Expr
+        Expr
   | BinOp String
           Expr
           Expr

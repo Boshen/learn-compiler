@@ -5,10 +5,15 @@ import           Text.Parsec.String   (Parser)
 import qualified Text.Parsec.Token    as T
 
 opNames :: [String]
-opNames = ["="]
+opNames = []
+
+reservedNames :: [String]
+reservedNames = ["let", "in", "=", "\\", "->"]
 
 lexer :: T.TokenParser ()
-lexer = T.makeTokenParser haskellStyle {T.reservedOpNames = opNames}
+lexer =
+  T.makeTokenParser
+    haskellStyle {T.reservedOpNames = opNames, T.reservedNames = reservedNames}
 
 whiteSpace :: Parser ()
 whiteSpace = T.whiteSpace lexer

@@ -26,15 +26,24 @@ str = Str <$> L.str
 
 lambda :: Parser Expr
 lambda = do
-  name <- L.identifier
+  L.reserved "\\"
   args <- many1 L.identifier
-  L.reserved "="
+  L.reserved "->"
   body <- expr
   return $ foldr Lambda body args
 
+letExpr :: Parser Expr
+letExpr = do
+  L.reserved "let"
+  var <- L.identifier
+  L.reserved "="
+  ex <- expr
+  L.reserved "in"
+  body <- expr
+  return $ Let var ex body
+
 factor :: Parser Expr
-factor =
-  try lambda <|> try variable <|> try number <|> try str <|> try (L.parens expr)
+factor = try $ choice [ L.parens expr, variable, str, number, lambda, letExpr ]
 
 expr :: Parser Expr
 expr = Ex.buildExpressionParser opTable factor
