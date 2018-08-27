@@ -1,7 +1,5 @@
 module Codegen where
 
-import           Data.List (intercalate)
-
 import           Syntax
 
 gen :: Expr -> String
