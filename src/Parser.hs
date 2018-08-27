@@ -17,23 +17,24 @@ number = Number <$> L.integer
 variable :: Parser Expr
 variable = var <$> L.identifier
   where
-    var "True" = Boolean True
+    var "True"  = Boolean True
     var "False" = Boolean False
-    var v = Var v
+    var v       = Var v
 
 str :: Parser Expr
 str = Str <$> L.str
 
-function :: Parser Expr
-function = do
+lambda :: Parser Expr
+lambda = do
   name <- L.identifier
-  args <- many L.identifier
+  args <- many1 L.identifier
   L.reserved "="
   body <- expr
-  return $ Func name args body
+  return $ foldr Lambda body args
 
 factor :: Parser Expr
-factor = try function <|> try variable <|> try number <|> try str <|> try (L.parens expr)
+factor =
+  try lambda <|> try variable <|> try number <|> try str <|> try (L.parens expr)
 
 expr :: Parser Expr
 expr = Ex.buildExpressionParser opTable factor
@@ -46,9 +47,9 @@ opTable =
   ]
   where
     binary s f = Ex.Infix (L.reservedOp s >> return (BinOp f))
-    spacef = L.whiteSpace
-      *> notFollowedBy (choice . map L.reservedOp $ L.opNames)
-      >> return App
+    spacef =
+      L.whiteSpace *> notFollowedBy (choice . map L.reservedOp $ L.opNames) >>
+      return App
 
 contents :: Parser a -> Parser a
 contents p = do

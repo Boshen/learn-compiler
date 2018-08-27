@@ -24,9 +24,9 @@ spec = describe "Parser" $ do
     parseExpr "True" `shouldBe` Right (Boolean True)
     parseExpr "False" `shouldBe` Right (Boolean False)
 
-  specify "function" $ do
-    parseExpr "foo a = a" `shouldBe` Right (Func "foo" ["a"] (Var "a"))
-    parseExpr "foo a b c = d" `shouldBe` Right (Func "foo" ["a", "b", "c"] (Var "d"))
+  specify "lambda" $ do
+    parseExpr "foo a = a" `shouldBe` Right (Lambda "a" (Var "a"))
+    parseExpr "foo a b = c" `shouldBe` Right (Lambda "a" (Lambda "b" (Var "c")))
 
   specify "function application" $ do
     parseExpr "foo a" `shouldBe` Right (App (Var "foo") (Var "a"))

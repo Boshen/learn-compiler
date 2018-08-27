@@ -1,6 +1,6 @@
 module Lexer where
 
-import           Text.Parsec.Language (emptyDef)
+import           Text.Parsec.Language (haskellStyle)
 import           Text.Parsec.String   (Parser)
 import qualified Text.Parsec.Token    as T
 
@@ -8,7 +8,7 @@ opNames :: [String]
 opNames = ["="]
 
 lexer :: T.TokenParser ()
-lexer = T.makeTokenParser emptyDef {T.reservedOpNames = opNames}
+lexer = T.makeTokenParser haskellStyle {T.reservedOpNames = opNames}
 
 whiteSpace :: Parser ()
 whiteSpace = T.whiteSpace lexer
