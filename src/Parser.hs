@@ -27,13 +27,13 @@ str = Str <$> L.str
 function :: Parser Expr
 function = do
   name <- L.identifier
-  args <- L.identifier
+  args <- many L.identifier
   L.reserved "="
   body <- expr
   return $ Func name args body
 
 factor :: Parser Expr
-factor = try function <|> try variable <|> try number <|> try str
+factor = try function <|> try variable <|> try number <|> try str <|> try (L.parens expr)
 
 expr :: Parser Expr
 expr = Ex.buildExpressionParser opTable factor

@@ -7,7 +7,7 @@ data Expr
   | Var Name
   | Str String
   | Boolean Bool
-  | Func Name Name Expr
+  | Func Name [Name] Expr
   | App Expr Expr
   | BinOp String
           Expr

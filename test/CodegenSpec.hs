@@ -21,8 +21,9 @@ spec = describe "Codegen" $ do
   prop "Boolean" $ \b ->
     gen (Boolean (b :: Bool)) == if b then "true" else "false"
 
-  specify "Func" $
-    gen (Func "foo" "bar" (Var "a")) `shouldBe` "const foo = (bar) => a"
+  specify "Func" $ do
+    gen (Func "foo" ["bar"] (Var "a")) `shouldBe` "const foo = (bar) => a"
+    gen (Func "foo" ["bar", "baz"] (Var "a")) `shouldBe` "const foo = (bar,baz) => a"
 
   specify "App" $
     gen (App (Var "foo") (Var "bar")) `shouldBe` "foo(bar)"
