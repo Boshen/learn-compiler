@@ -25,6 +25,9 @@ spec = describe "Codegen" $ do
     gen (Lambda "foo" (Var "a")) `shouldBe` "(foo)=>a"
     gen (Lambda "foo" (Lambda "bar" (Var "baz"))) `shouldBe` "(foo)=>(bar)=>baz"
 
+  specify "If" $
+    gen (If (Var "x") (Var "y") (Var "z")) `shouldBe` "x ? y : z"
+
   specify "Let" $
     gen (Let "foo" (Var "x") (Var "y")) `shouldBe` "const foo=()=>{x;return y}"
 

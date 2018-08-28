@@ -32,6 +32,16 @@ lambda = do
   body <- expr
   return $ foldr Lambda body args
 
+ifExpr :: Parser Expr
+ifExpr = do
+  L.reserved "if"
+  e1 <- expr
+  L.reserved "then"
+  e2 <- expr
+  L.reserved "else"
+  e3 <- expr
+  return $ If e1 e2 e3
+
 letExpr :: Parser Expr
 letExpr = do
   L.reserved "let"
@@ -43,7 +53,7 @@ letExpr = do
   return $ Let var ex body
 
 factor :: Parser Expr
-factor = try $ choice [ L.parens expr, variable, str, number, lambda, letExpr ]
+factor = try $ choice [ L.parens expr, variable, str, number, lambda, ifExpr, letExpr ]
 
 expr :: Parser Expr
 expr = Ex.buildExpressionParser opTable factor

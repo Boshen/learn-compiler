@@ -7,6 +7,7 @@ data Expr
   | Var Name
   | Str String
   | Boolean Bool
+  | If Expr Expr Expr
   | Lambda Name
            Expr
   | Let Name

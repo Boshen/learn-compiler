@@ -22,6 +22,9 @@ spec = describe "Parser" $ do
     parseExpr "True" `shouldBe` Right (Boolean True)
     parseExpr "False" `shouldBe` Right (Boolean False)
 
+  specify "if then else" $
+    parseExpr "if x then y else z" `shouldBe` Right (If (Var "x") (Var "y") (Var "z"))
+
   specify "lambda" $ do
     parseExpr "\\ a -> a" `shouldBe` Right (Lambda "a" (Var "a"))
     parseExpr "\\ a b -> c" `shouldBe` Right (Lambda "a" (Lambda "b" (Var "c")))

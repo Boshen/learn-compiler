@@ -8,7 +8,7 @@ opNames :: [String]
 opNames = []
 
 reservedNames :: [String]
-reservedNames = ["let", "in", "=", "\\", "->"]
+reservedNames = ["let", "in", "=", "\\", "->", "if", "then", "else"]
 
 lexer :: T.TokenParser ()
 lexer =
