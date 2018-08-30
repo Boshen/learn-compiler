@@ -15,3 +15,12 @@ spec = describe "Integration" $ do
     case parseExpr source of
       Right expr -> gen expr `shouldBe` target
       Left err   -> expectationFailure (show err)
+
+  specify "test 2" $ do
+    let
+      source = "if x then (if a then b else c) else z"
+      target = "x ? (a ? b : c) : z"
+
+    case parseExpr source of
+      Right expr -> gen expr `shouldBe` target
+      Left err   -> expectationFailure (show err)
