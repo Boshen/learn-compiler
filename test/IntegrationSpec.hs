@@ -24,3 +24,12 @@ spec = describe "Integration" $ do
     case parseExpr source of
       Right expr -> gen expr `shouldBe` target
       Left err   -> expectationFailure (show err)
+
+  specify "test 3" $ do
+    let
+      source = "map (\\ n -> n * 2) (range 1 100)"
+      target = "map((n)=>n*2)(range(1)(100))"
+
+    case parseExpr source of
+      Right expr -> gen expr `shouldBe` target
+      Left err   -> expectationFailure (show err)
