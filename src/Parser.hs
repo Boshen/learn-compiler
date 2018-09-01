@@ -2,13 +2,11 @@ module Parser
   ( parseExpr
   ) where
 
-import           Data.Functor.Identity
-import           Text.Parsec
-import qualified Text.Parsec.Expr      as Ex
-import           Text.Parsec.String    (Parser)
-import qualified Text.Parsec.Token     as T
+import           Text.Megaparsec
+import qualified Text.Megaparsec.Expr as Ex
 
-import qualified Lexer                 as L
+import           Lexer                (Parser)
+import qualified Lexer                as L
 import           Syntax
 
 number :: Parser Expr
@@ -26,29 +24,29 @@ str = Str <$> L.str
 
 lambda :: Parser Expr
 lambda = do
-  L.reserved "\\"
-  args <- many1 L.identifier
-  L.reserved "->"
+  L.symbol "\\"
+  args <- some L.identifier
+  L.symbol "->"
   body <- expr
   return $ foldr Lambda body args
 
 ifExpr :: Parser Expr
 ifExpr = do
-  L.reserved "if"
+  L.symbol "if"
   e1 <- expr
-  L.reserved "then"
+  L.symbol "then"
   e2 <- expr
-  L.reserved "else"
+  L.symbol "else"
   e3 <- expr
   return $ If e1 e2 e3
 
 letExpr :: Parser Expr
 letExpr = do
-  L.reserved "let"
+  L.symbol "let"
   var <- L.identifier
-  L.reserved "="
+  L.symbol "="
   ex <- expr
-  L.reserved "in"
+  L.symbol "in"
   body <- expr
   return $ Let var ex body
 
@@ -56,26 +54,25 @@ factor :: Parser Expr
 factor = try $ choice [ L.parens expr, variable, str, number, lambda, ifExpr, letExpr ]
 
 expr :: Parser Expr
-expr = Ex.buildExpressionParser opTable factor
+expr = Ex.makeExprParser factor opTable
 
-opTable :: [[Ex.Operator String () Identity Expr]]
+opTable :: [[Ex.Operator Parser Expr]]
 opTable =
-  [ [Ex.Infix spacef Ex.AssocLeft]
-  , [binary "*" "*" Ex.AssocLeft, binary "/" "/" Ex.AssocLeft]
-  , [binary "+" "+" Ex.AssocLeft, binary "-" "-" Ex.AssocLeft]
+  [ [Ex.InfixL spacef ]
+  , [binary "*" "*" , binary "/" "/" ]
+  , [binary "+" "+" , binary "-" "-" ]
   ]
   where
-    binary s f = Ex.Infix (L.reservedOp s >> return (BinOp f))
+    binary s f = Ex.InfixL (L.symbol s >> return (BinOp f))
     spacef =
-      L.whiteSpace *> notFollowedBy (choice . map L.reservedOp $ L.opNames) >>
+      L.sc *> notFollowedBy (choice . map L.symbol $ L.opNames) >>
       return App
 
 contents :: Parser a -> Parser a
 contents p = do
-  T.whiteSpace L.lexer
+  L.sc
   r <- p
   eof
   return r
 
-parseExpr :: String -> Either ParseError Expr
 parseExpr = parse (contents expr) "<stdin>"

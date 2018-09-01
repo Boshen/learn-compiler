@@ -1,8 +1,11 @@
 module Lexer where
 
-import           Text.Parsec.Language (haskellStyle)
-import           Text.Parsec.String   (Parser)
-import qualified Text.Parsec.Token    as T
+import           Data.Void
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
+
+type Parser = Parsec Void String
 
 opNames :: [String]
 opNames = []
@@ -10,34 +13,32 @@ opNames = []
 reservedNames :: [String]
 reservedNames = ["let", "in", "=", "\\", "->", "if", "then", "else"]
 
-lexer :: T.TokenParser ()
-lexer =
-  T.makeTokenParser
-    haskellStyle {T.reservedOpNames = opNames, T.reservedNames = reservedNames}
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme sc
 
-whiteSpace :: Parser ()
-whiteSpace = T.whiteSpace lexer
+sc :: Parser ()
+sc = L.space space1 (L.skipLineComment "--") (L.skipBlockComment "{--" "--}")
+
+int :: Parser Integer
+int = lexeme L.decimal
 
 integer :: Parser Integer
-integer = T.integer lexer
+integer = L.signed sc int
+
+symbol :: String -> Parser String
+symbol = L.symbol sc
 
 parens :: Parser a -> Parser a
-parens = T.parens lexer
-
-commaSep :: Parser a -> Parser [a]
-commaSep = T.commaSep lexer
-
-semiSep :: Parser a -> Parser [a]
-semiSep = T.semiSep lexer
-
-identifier :: Parser String
-identifier = T.identifier lexer
+parens = between (symbol "(") (symbol ")")
 
 str :: Parser String
-str = T.stringLiteral lexer
+str = char '"' >> manyTill L.charLiteral (char '"')
 
-reserved :: String -> Parser ()
-reserved = T.reserved lexer
-
-reservedOp :: String -> Parser ()
-reservedOp = T.reservedOp lexer
+identifier :: Parser String
+identifier = (lexeme . try) (p >>= check)
+  where
+    p = (:) <$> letterChar <*> many alphaNumChar
+    check x =
+      if x `elem` reservedNames
+        then fail $ "keyword " ++ show x ++ " cannot be an identifier"
+        else return x
