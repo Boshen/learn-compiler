@@ -1,5 +1,6 @@
 module Lexer where
 
+import           Data.Maybe
 import           Data.Void
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
@@ -32,7 +33,9 @@ parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
 str :: Parser String
-str = char '"' >> manyTill L.charLiteral (char '"')
+str = catMaybes <$> (char '"' >> manyTill ch (char '"'))
+  where
+    ch = (Just <$> L.charLiteral) <|> (Nothing <$ string "\\&")
 
 identifier :: Parser String
 identifier = (lexeme . try) (p >>= check)

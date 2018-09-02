@@ -23,6 +23,7 @@ dependencies:
 - QuickCheck >= 2.11
 - haskeline >= 0.7.4
 - hspec >= 2.5
+- hspec-megaparsec >= 1.1
 - megaparsec >= 6.5
 - mtl >= 2.2
 

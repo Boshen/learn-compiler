@@ -1,22 +1,33 @@
 module LexerSpec where
 
 import           Test.Hspec
+import           Test.Hspec.Megaparsec
 import           Test.Hspec.QuickCheck
-import           Test.QuickCheck
-import           Text.Megaparsec       (parse)
+import           Text.Megaparsec
 
 import qualified Lexer                 as L
 
+prs :: Parsec e s a -> s -> Either (ParseError (Token s) e) a
+prs p = parse p ""
+
 spec :: Spec
 spec = describe "Lexer" $ do
+  specify "space consumer" $ do
+    prs L.sc "--" `shouldParse` ()
+    prs L.sc "{-- --}" `shouldParse` ()
+
   prop "integer" $ \i ->
-    parse L.integer "" (show (i :: Integer)) === Right i
+    prs L.integer (show (i :: Integer)) `shouldParse` i
 
   prop "str" $ \s ->
-    parse L.str "" (s :: String) === Right s
+    prs L.str (show s :: String) `shouldParse` s
+
+  prop "symbol" $ \s ->
+    prs (L.symbol (s :: String)) s `shouldParse` s
 
   prop "parens" $ \i ->
-    parse (L.parens L.integer) "" ("(" ++ show (i :: Integer) ++ ")") == Right i
+    prs (L.parens L.integer) ("(" ++ show (i :: Integer) ++ ")") `shouldParse` i
 
-  specify "identifier" $
-    parse L.identifier "" "asdf" `shouldBe` Right "asdf"
+  specify "identifier" $ do
+    prs L.identifier "asdf" `shouldParse` "asdf"
+    prs L.identifier `shouldFailOn` "let"

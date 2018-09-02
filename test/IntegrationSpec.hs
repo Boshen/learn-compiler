@@ -9,7 +9,7 @@ spec :: Spec
 spec = describe "Integration" $ do
   specify "test 1" $ do
     let
-      source = "\\ x y -> let x = if x then x else y in x + 2"
+      source = "\\x y -> let x = if x then x else y in x + 2"
       target = "(x)=>(y)=>const x=()=>{x ? x : y;return x(2)}"
 
     case parseExpr source of
@@ -27,7 +27,7 @@ spec = describe "Integration" $ do
 
   specify "test 3" $ do
     let
-      source = "map (\\ n -> n * 2) (range 1 100)"
+      source = "map (\\n -> n * 2) (range 1 100)"
       target = "map((n)=>n*2)(range(1)(100))"
 
     case parseExpr source of
