@@ -1,35 +1,30 @@
 module IntegrationSpec where
 
+import           Control.Monad
+import           Data.Either
+import           Data.Void
 import           Test.Hspec
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
 import           Codegen
 import           Parser
 
+testCase :: Parsec Void String String
+testCase = do
+  void $ string "----"
+  void space1
+  void $ many (alphaNumChar <|> char '.')
+  void newline
+  code <- manyTill (asciiChar <|> newline) (string "\n\n")
+  return code
+
 spec :: Spec
-spec = describe "Integration" $ do
-  specify "test 1" $ do
-    let
-      source = "\\x y -> let x = if x then x else y in x + 2"
-      target = "(x)=>(y)=>const x=()=>{x ? x : y;return x(2)}"
-
-    case parseExpr source of
-      Right expr -> gen expr `shouldBe` target
-      Left err   -> expectationFailure (show err)
-
-  specify "test 2" $ do
-    let
-      source = "if x then (if a then b else c) else z"
-      target = "x ? (a ? b : c) : z"
-
-    case parseExpr source of
-      Right expr -> gen expr `shouldBe` target
-      Left err   -> expectationFailure (show err)
-
-  specify "test 3" $ do
-    let
-      source = "map (\\n -> n * 2) (range 1 100)"
-      target = "map((n)=>n*2)(range(1)(100))"
-
-    case parseExpr source of
-      Right expr -> gen expr `shouldBe` target
-      Left err   -> expectationFailure (show err)
+spec =
+  beforeAll (readFile "./test/cases/case1.hs") $
+    describe "Integration" $
+      specify "test" $ \file ->
+        forM_ (fromRight [] $ parse (many $ count 2 testCase) "" file) $ \[source, target] ->
+          case parseExpr source of
+            Right expr -> gen expr `shouldBe` target
+            Left err   -> expectationFailure (show err)
