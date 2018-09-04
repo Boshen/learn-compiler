@@ -22,17 +22,17 @@ spec = describe "Codegen" $ do
     gen (Boolean (b :: Bool)) == if b then "true" else "false"
 
   specify "Lambda" $ do
-    gen (Lambda "foo" (Var "a")) `shouldBe` "(foo)=>a"
-    gen (Lambda "foo" (Lambda "bar" (Var "baz"))) `shouldBe` "(foo)=>(bar)=>baz"
+    gen (Lambda "foo" (Var "a")) `shouldBe` "(foo) => a"
+    gen (Lambda "foo" (Lambda "bar" (Var "baz"))) `shouldBe` "(foo) => (bar) => baz"
 
   specify "If" $
     gen (If (Var "x") (Var "y") (Var "z")) `shouldBe` "x ? y : z"
 
   specify "Let" $
-    gen (Let "foo" (Var "x") (Var "y")) `shouldBe` "const foo=()=>{x;return y}"
+    gen (Let "foo" (Var "x") (Var "y")) `shouldBe` "const foo = () => { x; return y }"
 
   specify "App" $
     gen (App (Var "foo") (Var "bar")) `shouldBe` "foo(bar)"
 
   prop "BinOp" $ forAll (elements ["+", "-", "*", "/"]) $ \op ->
-    gen (BinOp op (Var "a") (Var "b")) == "a" ++ op ++ "b"
+    gen (BinOp op (Var "a") (Var "b")) === "a " ++ op ++ " b"
