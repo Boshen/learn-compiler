@@ -2,6 +2,8 @@ module Parser
   ( parseExpr
   ) where
 
+import           Control.Monad
+import           Data.Void
 import           Text.Megaparsec
 import qualified Text.Megaparsec.Expr as Ex
 
@@ -24,49 +26,49 @@ str = Str <$> L.str
 
 lambda :: Parser Expr
 lambda = do
-  L.symbol "\\"
+  void $ L.symbol "\\"
   args <- some L.identifier
-  L.symbol "->"
+  void $ L.symbol "->"
   body <- expr
   return $ foldr Lambda body args
 
 ifExpr :: Parser Expr
 ifExpr = do
-  L.symbol "if"
+  void $ L.symbol "if"
   e1 <- expr
-  L.symbol "then"
+  void $ L.symbol "then"
   e2 <- expr
-  L.symbol "else"
+  void $ L.symbol "else"
   e3 <- expr
   return $ If e1 e2 e3
 
 letExpr :: Parser Expr
 letExpr = do
-  L.symbol "let"
+  void $ L.symbol "let"
   var <- L.identifier
-  L.symbol "="
+  void $ L.symbol "="
   ex <- expr
-  L.symbol "in"
+  void $ L.symbol "in"
   body <- expr
   return $ Let var ex body
 
 factor :: Parser Expr
-factor = try $ choice [ L.parens expr, variable, str, number, lambda, ifExpr, letExpr ]
+factor =
+  try $ choice [L.parens expr, variable, str, number, lambda, ifExpr, letExpr]
 
 expr :: Parser Expr
 expr = Ex.makeExprParser factor opTable
 
 opTable :: [[Ex.Operator Parser Expr]]
 opTable =
-  [ [Ex.InfixL spacef ]
-  , [binary "*" "*" , binary "/" "/" ]
-  , [binary "+" "+" , binary "-" "-" ]
+  [ [Ex.InfixL spacef]
+  , [binary "*" "*", binary "/" "/"]
+  , [binary "+" "+", binary "-" "-"]
   ]
   where
     binary s f = Ex.InfixL (L.symbol s >> return (BinOp f))
     spacef =
-      L.sc *> notFollowedBy (choice . map L.symbol $ L.opNames) >>
-      return App
+      L.sc *> notFollowedBy (choice . map L.symbol $ L.opNames) >> return App
 
 contents :: Parser a -> Parser a
 contents p = do
@@ -75,4 +77,5 @@ contents p = do
   eof
   return r
 
+parseExpr :: String -> Either (ParseError Char Void) Expr
 parseExpr = parse (contents expr) "<stdin>"
