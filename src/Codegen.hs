@@ -3,9 +3,9 @@ module Codegen where
 import           Syntax
 
 gen :: Expr -> String
-gen (Number x) = show x
+gen (Number a) = show a
 
-gen (Var x) = x
+gen (Var a) = a
 
 gen (Str s) = show s
 
