@@ -19,3 +19,10 @@ data Expr
           Expr
           Expr
   deriving (Eq, Ord, Show)
+
+data Type
+  = TBool
+  | TNat
+  | TStr
+  | TArrow
+  deriving (Eq, Show)

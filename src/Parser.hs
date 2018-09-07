@@ -1,5 +1,6 @@
 module Parser
   ( parseExpr
+  , parseDef
   ) where
 
 import           Control.Monad
@@ -70,12 +71,21 @@ opTable =
     spacef =
       L.sc *> notFollowedBy (choice . map L.symbol $ L.opNames) >> return App
 
+def :: Parser Expr
+def = do
+  name:args <- some L.identifier
+  void $ L.symbol "="
+  body <- expr
+  return $ Let name (foldr Lambda body args) (Var name)
+
 contents :: Parser a -> Parser a
 contents p = do
   L.sc
   r <- p
   eof
   return r
-
 parseExpr :: String -> Either (ParseError Char Void) Expr
 parseExpr = parse (contents expr) "<stdin>"
+
+parseDef :: String -> Either (ParseError Char Void) Expr
+parseDef = parse (contents def) "<stdin>"

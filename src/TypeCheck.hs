@@ -6,7 +6,6 @@ module TypeCheck
 import           Control.Monad.Except
 
 import           Syntax
-import           Type
 
 data TypeError =
   TypeMismatch Type

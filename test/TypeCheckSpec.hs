@@ -4,7 +4,6 @@ import           Test.Hspec
 import           Test.Hspec.QuickCheck
 
 import           Syntax
-import           Type
 import           TypeCheck
 
 spec :: Spec
